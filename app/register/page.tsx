@@ -46,7 +46,7 @@ export default function RegisterPage() {
       <div className="mx-auto max-w-md rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
         <div className="text-xs font-semibold text-zinc-400">REGISTER</div>
         <h1 className="mt-2 text-xl font-semibold tracking-tight text-zinc-50">
-          cekinan Waren League
+          cekinan Leaderbord
         </h1>
         <p className="mt-2 text-sm text-zinc-400">Buat akun baru.</p>
 

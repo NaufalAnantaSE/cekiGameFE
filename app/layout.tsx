@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "cekinan Waren League",
+  title: "cekinan Leaderbord",
   description: "Pencatat skor Ceki/Remi",
 };
 

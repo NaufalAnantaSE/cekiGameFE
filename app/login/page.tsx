@@ -28,7 +28,7 @@ export default function LoginPage() {
       <div className="mx-auto max-w-md rounded-3xl border border-zinc-800 bg-zinc-950/60 p-6">
         <div className="text-xs font-semibold text-zinc-400">LOGIN</div>
         <h1 className="mt-2 text-xl font-semibold tracking-tight text-zinc-50">
-          cekinan Waren League
+          cekinan Leaderbord
         </h1>
         <p className="mt-2 text-sm text-zinc-400">
           Masuk untuk mulai buat session.

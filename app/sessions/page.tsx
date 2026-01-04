@@ -66,7 +66,7 @@ export default function SessionsPage() {
                         <div>
                             <div className="text-xs font-semibold text-zinc-400">SESSIONS</div>
                             <div className="mt-1 text-lg font-semibold tracking-tight text-zinc-50">
-                                cekinan Waren League
+                                cekinan Leaderbord
                             </div>
                         </div>
                         <button
