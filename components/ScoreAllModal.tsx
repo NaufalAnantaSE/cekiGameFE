@@ -17,6 +17,16 @@ export default function ScoreAllModal({
   onClose,
   onSubmit,
 }: Props) {
+  const normalizeScoreText = (raw: string) => {
+    const trimmed = raw.trim();
+    if (trimmed === "") return "";
+
+    const isNegative = trimmed.startsWith("-");
+    const digitsOnly = trimmed.replace(/[^0-9]/g, "");
+    if (digitsOnly.length === 0) return isNegative ? "-" : "";
+    return `${isNegative ? "-" : ""}${digitsOnly}`;
+  };
+
   const [values, setValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     for (const p of players) initial[p.id] = "0";
@@ -66,17 +76,37 @@ export default function ScoreAllModal({
                 <div className="text-sm font-semibold">{row.name}</div>
                 <div className="mt-2 flex gap-2">
                   <input
+                    type="text"
                     inputMode="numeric"
+                    pattern="-?[0-9]*"
                     value={row.value}
                     onChange={(e) =>
                       setValues((v) => ({
                         ...v,
-                        [row.playerId]: e.target.value,
+                        [row.playerId]: normalizeScoreText(e.target.value),
                       }))
                     }
                     className="h-12 flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 text-sm outline-none focus:border-fuchsia-500"
                     placeholder="0"
                   />
+                  <button
+                    type="button"
+                    className="h-12 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-xs font-semibold text-zinc-200"
+                    onClick={() => {
+                      setValues((v) => {
+                        const current = v[row.playerId] ?? "0";
+                        if (current.startsWith("-")) {
+                          return { ...v, [row.playerId]: current.slice(1) || "0" };
+                        }
+                        if (current === "" || current === "0") {
+                          return { ...v, [row.playerId]: "-0" };
+                        }
+                        return { ...v, [row.playerId]: `-${current}` };
+                      });
+                    }}
+                  >
+                    +/-
+                  </button>
                   <div className="flex items-center">
                     <span
                       className={
