@@ -4,6 +4,17 @@ type ApiOptions = {
   headers?: Record<string, string>;
 };
 
+export type ApiUnauthorizedHandler = (info: {
+  path: string;
+  status: number;
+}) => void;
+
+let unauthorizedHandler: ApiUnauthorizedHandler | null = null;
+
+export function setApiUnauthorizedHandler(handler: ApiUnauthorizedHandler | null) {
+  unauthorizedHandler = handler;
+}
+
 type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 function getApiBaseUrl(): string {
@@ -52,6 +63,14 @@ async function apiRequest<T>(
     cache: "no-store",
   });
 
+  if (res.status === 401 && wantsAuth) {
+    try {
+      unauthorizedHandler?.({ path, status: res.status });
+    } catch {
+      // ignore handler errors
+    }
+  }
+
   const contentType = res.headers.get("content-type") ?? "";
   const isJson = contentType.includes("application/json");
 
@@ -74,7 +93,9 @@ async function apiRequest<T>(
     const message = details
       ? `API ${res.status} ${res.statusText}: ${details}`
       : `API ${res.status} ${res.statusText}`;
-    throw new Error(message);
+    const err = new Error(message) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
 
   if (res.status === 204) {

@@ -17,6 +17,14 @@ export type GameSession = {
   players: Player[];
 };
 
+export type GameSessionSummary = {
+  id: string;
+  createdAt: string;
+  playerCount: number;
+  targetScore: number;
+  isFinished: boolean;
+};
+
 export type GameRoundHistory = {
   id: string;
   type: "ALL" | "NGANDANG" | string;
@@ -28,6 +36,7 @@ export type GameRoundHistory = {
 };
 
 type SessionState = {
+  mySessions: GameSessionSummary[];
   currentSession: GameSession | null;
   rounds: GameRoundHistory[];
   isLoading: boolean;
@@ -35,11 +44,19 @@ type SessionState = {
 };
 
 const initialState: SessionState = {
+  mySessions: [],
   currentSession: null,
   rounds: [],
   isLoading: false,
   error: null,
 };
+
+export const fetchMySessions = createAsyncThunk<GameSessionSummary[]>(
+  "session/fetchMySessions",
+  async () => {
+    return apiGet<GameSessionSummary[]>("/game-sessions");
+  },
+);
 
 export const fetchSession = createAsyncThunk<GameSession, { sessionId: string }>(
   "session/fetchSession",
@@ -141,6 +158,7 @@ const sessionSlice = createSlice({
       state.error = null;
     },
     resetSessionState(state) {
+      state.mySessions = [];
       state.currentSession = null;
       state.rounds = [];
       state.isLoading = false;
@@ -149,6 +167,18 @@ const sessionSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchMySessions.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMySessions.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.mySessions = action.payload;
+      })
+      .addCase(fetchMySessions.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message ?? "Gagal ambil sessions";
+      })
       .addCase(fetchSession.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -169,6 +199,10 @@ const sessionSlice = createSlice({
       })
       .addCase(createSession.rejected, (state, action) => {
         state.error = action.error.message ?? "Gagal buat session";
+      })
+      .addCase(createSession.fulfilled, (state) => {
+        // optional: list refresh handled by page
+        state.error = null;
       })
       .addCase(addPlayer.rejected, (state, action) => {
         state.error = action.error.message ?? "Gagal tambah player";
